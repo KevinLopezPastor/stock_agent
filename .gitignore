@@ -1,0 +1,59 @@
+# --- Terraform ---
+**/.terraform/
+*.tfstate
+*.tfstate.backup
+**/.terraform.lock.hcl
+terraform/terraform.tfvars
+terraform/*.auto.tfvars
+terraform/crash.log
+
+# --- Python ---
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd
+**/*.egg-info/
+tmp_*.py
+dist/
+build/
+.eggs/
+*.egg
+.venv/
+venv/
+env/
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+
+# --- AI & Knowledge Base ---
+# Large binary files and data should be managed via scripts or S3, not git
+agent/knowledge_base/faiss_index/
+agent/knowledge_base/pdfs/*.pdf
+
+# --- Jupyter Notebooks ---
+**/.ipynb_checkpoints/
+**/_checkpoint*
+
+# --- IDEs & OS ---
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# --- Docker ---
+*.tar
+docker-compose.override.yml
+*.log
+
+# --- Environment & Secrets ---
+.env
+.env.local
+.env.*.local
+*.pem
+*.key

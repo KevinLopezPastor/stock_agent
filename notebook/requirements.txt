@@ -1,0 +1,33 @@
+# Core web framework
+fastapi>=0.115.0,<0.116.0
+uvicorn[standard]>=0.34.0,<0.35.0
+
+# LangChain / LangGraph
+langgraph>=0.4.0,<0.5.0
+langchain>=0.3.0,<0.4.0
+langchain-aws>=0.2.0,<0.3.0
+langchain-community>=0.3.0,<0.4.0
+
+# Observability
+langfuse>=2.0.0,<3.0.0
+
+# Vector store & document processing
+faiss-cpu>=1.9.0,<2.0.0
+pypdf>=5.0.0,<6.0.0
+
+# Finance
+yfinance>=0.2.40,<0.3.0
+
+# AWS SDK
+boto3>=1.36.0,<2.0.0
+
+# Auth
+python-jose[cryptography]>=3.3.0,<4.0.0
+cryptography>=44.0.0,<45.0.0
+
+# HTTP
+httpx>=0.28.0,<0.29.0
+requests>=2.32.0,<3.0.0
+
+# SSE
+sse-starlette>=2.0.0,<3.0.0

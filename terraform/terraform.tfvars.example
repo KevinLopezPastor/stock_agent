@@ -1,0 +1,18 @@
+# Copy this file to terraform.tfvars and fill in the values.
+# terraform.tfvars is in .gitignore and will NOT be committed.
+
+aws_region    = "us-east-1"
+project_name  = "stock-agent"
+environment   = "dev"
+
+# Bedrock models
+bedrock_model_id           = "us.anthropic.claude-sonnet-4-6"
+bedrock_embedding_model_id = "amazon.titan-embed-text-v2:0"
+
+# Langfuse (free-tier cloud)
+langfuse_public_key = "pk-lf-..."
+langfuse_secret_key = "sk-lf-..."
+langfuse_base_url   = "https://us.cloud.langfuse.com"
+
+# Container
+container_image_tag = "latest"

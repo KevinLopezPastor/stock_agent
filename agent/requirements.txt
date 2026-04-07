@@ -1,0 +1,29 @@
+# Core web framework
+fastapi>=0.115.0,<0.116.0
+uvicorn[standard]>=0.34.0,<0.35.0
+
+# LangChain / LangGraph
+langgraph==1.1.5
+langchain==1.2.14
+langchain-aws>=0.2.11
+langchain-community==0.4.1
+langchain-text-splitters>=0.3.0
+
+# Auth
+python-jose[cryptography]>=3.3.0,<4.0.0
+cryptography>=44.0.0,<45.0.0
+
+# HTTP & Stock
+httpx>=0.28.0,<0.29.0
+requests>=2.32.0,<3.0.0
+yfinance>=0.2.40
+
+# RAG / PDF
+pypdf>=5.1.0
+
+# SSE
+sse-starlette>=2.0.0,<3.0.0
+
+# Observability
+langfuse>=2.53.0
+boto3>=1.35.0
