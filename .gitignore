@@ -21,6 +21,7 @@ build/
 .venv/
 venv/
 env/
+agent/test_env/
 .pytest_cache/
 .coverage
 htmlcov/
