@@ -50,6 +50,7 @@ Thumbs.db
 *.tar
 docker-compose.override.yml
 *.log
+*.bat
 
 # --- Environment & Secrets ---
 .env
