@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-###############################################################################
 # deploy_container.sh
 #
 # Builds the agent Docker image (ARM64), pushes to ECR, and optionally
@@ -12,7 +11,6 @@
 #   - AWS CLI configured with credentials
 #   - Docker with BuildX support
 #   - Terraform outputs available (run from repo root after `terraform apply`)
-###############################################################################
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

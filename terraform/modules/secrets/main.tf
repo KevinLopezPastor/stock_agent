@@ -1,6 +1,3 @@
-###############################################################################
-# Secrets Manager — Langfuse Credentials
-###############################################################################
 resource "aws_secretsmanager_secret" "langfuse" {
   name                    = "${var.project_name}-${var.environment}-langfuse"
   description             = "Langfuse observability credentials"

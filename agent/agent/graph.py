@@ -8,7 +8,7 @@ from langgraph.graph import StateGraph, END
 from langgraph.prebuilt import ToolNode
 from langgraph.checkpoint.memory import MemorySaver
 
-# --- REDUCED IMPORTS ---
+# REDUCED IMPORTS
 from agent.state import AgentState
 from agent.prompts import SYSTEM_PROMPT
 from agent.tools.stock_tools import retrieve_realtime_stock_price, retrieve_historical_stock_price
@@ -20,9 +20,7 @@ def create_agent_graph():
     """
     Creates the Full AI Stock Agent (Version 48)
     """
-    # -----------------------------------------------------------------------
     # 1. Tools
-    # -----------------------------------------------------------------------
     tools = [
         retrieve_realtime_stock_price, 
         retrieve_historical_stock_price,
@@ -30,9 +28,7 @@ def create_agent_graph():
     ]
     tool_node = ToolNode(tools)
 
-    # -----------------------------------------------------------------------
     # 2. LLM
-    # -----------------------------------------------------------------------
     model_id = os.environ.get("BEDROCK_MODEL_ID", "amazon.nova-lite-v1:0")
     logger.info(f"Using model: {model_id}")
 
@@ -46,9 +42,7 @@ def create_agent_graph():
     # Bind tools to the LLM
     llm_with_tools = llm.bind_tools(tools)
 
-    # -----------------------------------------------------------------------
     # 3. Nodes
-    # -----------------------------------------------------------------------
     def call_model(state: AgentState):
         messages = state["messages"]
         system_message = SystemMessage(content=SYSTEM_PROMPT)
@@ -64,9 +58,7 @@ def create_agent_graph():
             return "tools"
         return "__end__"
 
-    # -----------------------------------------------------------------------
     # 4. Building
-    # -----------------------------------------------------------------------
     builder = StateGraph(AgentState)
     
     builder.add_node("agent", call_model)

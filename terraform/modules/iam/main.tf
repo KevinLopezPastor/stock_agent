@@ -1,9 +1,7 @@
 data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
-###############################################################################
 # AgentCore Execution Role
-###############################################################################
 resource "aws_iam_role" "agentcore_execution" {
   name = "${var.project_name}-${var.environment}-agentcore-role"
 
@@ -26,9 +24,7 @@ resource "aws_iam_role" "agentcore_execution" {
   }
 }
 
-###############################################################################
 # Bedrock Model Invocation
-###############################################################################
 resource "aws_iam_role_policy" "bedrock_invoke" {
   name = "bedrock-invoke"
   role = aws_iam_role.agentcore_execution.id
@@ -58,14 +54,24 @@ resource "aws_iam_role_policy" "bedrock_invoke" {
           "arn:aws:bedrock:*::foundation-model/*",
           "arn:aws:bedrock:*:${data.aws_caller_identity.current.account_id}:inference-profile/*"
         ]
+      },
+      {
+        Sid    = "XRayAccess"
+        Effect = "Allow"
+        Action = [
+          "xray:PutTraceSegments",
+          "xray:PutTelemetryRecords",
+          "xray:GetSamplingRules",
+          "xray:GetSamplingTargets",
+          "xray:GetSamplingStatisticSummaries"
+        ]
+        Resource = "*"
       }
     ]
   })
 }
 
-###############################################################################
 # ECR Pull
-###############################################################################
 resource "aws_iam_role_policy" "ecr_pull" {
   name = "ecr-pull"
   role = aws_iam_role.agentcore_execution.id
@@ -91,9 +97,7 @@ resource "aws_iam_role_policy" "ecr_pull" {
   })
 }
 
-###############################################################################
 # Secrets Manager — read Langfuse credentials
-###############################################################################
 resource "aws_iam_role_policy" "secrets_read" {
   name = "secrets-read"
   role = aws_iam_role.agentcore_execution.id
@@ -112,9 +116,7 @@ resource "aws_iam_role_policy" "secrets_read" {
   })
 }
 
-###############################################################################
 # CloudWatch Logs
-###############################################################################
 resource "aws_iam_role_policy" "cloudwatch_logs" {
   name = "cloudwatch-logs"
   role = aws_iam_role.agentcore_execution.id

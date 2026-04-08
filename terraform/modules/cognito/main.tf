@@ -1,6 +1,4 @@
-###############################################################################
 # Cognito User Pool
-###############################################################################
 resource "aws_cognito_user_pool" "main" {
   name = "${var.project_name}-${var.environment}-user-pool"
 
@@ -20,10 +18,10 @@ resource "aws_cognito_user_pool" "main" {
 
   # Schema — email is required
   schema {
-    name                     = "email"
-    attribute_data_type      = "String"
-    mutable                  = true
-    required                 = true
+    name                = "email"
+    attribute_data_type = "String"
+    mutable             = true
+    required            = true
     string_attribute_constraints {
       min_length = 1
       max_length = 256
@@ -49,9 +47,7 @@ resource "aws_cognito_user_pool" "main" {
   }
 }
 
-###############################################################################
 # App Client — public (no secret) for notebook / CLI usage
-###############################################################################
 resource "aws_cognito_user_pool_client" "main" {
   name         = "${var.project_name}-${var.environment}-client"
   user_pool_id = aws_cognito_user_pool.main.id
@@ -67,9 +63,9 @@ resource "aws_cognito_user_pool_client" "main" {
   ]
 
   # Token validity
-  access_token_validity  = 1   # hours
-  id_token_validity      = 1   # hours
-  refresh_token_validity = 30  # days
+  access_token_validity  = 1  # hours
+  id_token_validity      = 1  # hours
+  refresh_token_validity = 30 # days
 
   token_validity_units {
     access_token  = "hours"
@@ -81,9 +77,7 @@ resource "aws_cognito_user_pool_client" "main" {
   prevent_user_existence_errors = "ENABLED"
 }
 
-###############################################################################
 # Cognito Domain (for hosted UI / token endpoint)
-###############################################################################
 resource "aws_cognito_user_pool_domain" "main" {
   domain       = "${var.project_name}-${var.environment}"
   user_pool_id = aws_cognito_user_pool.main.id

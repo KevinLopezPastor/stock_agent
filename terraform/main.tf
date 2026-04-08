@@ -1,6 +1,4 @@
-###############################################################################
 # Terraform Configuration
-###############################################################################
 terraform {
   required_version = ">= 1.5"
 
@@ -21,9 +19,7 @@ terraform {
   # }
 }
 
-###############################################################################
 # Provider
-###############################################################################
 provider "aws" {
   region = var.aws_region
 
@@ -36,17 +32,12 @@ provider "aws" {
   }
 }
 
-###############################################################################
 # Data Sources
-###############################################################################
 data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
-###############################################################################
 # Modules
-###############################################################################
-
-# --- Cognito ---
+# Cognito
 module "cognito" {
   source = "./modules/cognito"
 
@@ -54,7 +45,7 @@ module "cognito" {
   environment  = var.environment
 }
 
-# --- ECR ---
+# ECR
 module "ecr" {
   source = "./modules/ecr"
 
@@ -62,7 +53,7 @@ module "ecr" {
   environment  = var.environment
 }
 
-# --- Secrets Manager ---
+# Secrets Manager
 module "secrets" {
   source = "./modules/secrets"
 
@@ -73,7 +64,7 @@ module "secrets" {
   langfuse_base_url   = var.langfuse_base_url
 }
 
-# --- IAM ---
+# IAM
 module "iam" {
   source = "./modules/iam"
 
@@ -83,7 +74,7 @@ module "iam" {
   secrets_arn        = module.secrets.secret_arn
 }
 
-# --- AgentCore ---
+# AgentCore
 module "agentcore" {
   source = "./modules/agentcore"
 

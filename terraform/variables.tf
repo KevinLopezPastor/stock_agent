@@ -1,6 +1,4 @@
-###############################################################################
 # General
-###############################################################################
 variable "aws_region" {
   description = "AWS region for all resources"
   type        = string
@@ -19,9 +17,7 @@ variable "environment" {
   default     = "dev"
 }
 
-###############################################################################
 # Bedrock / LLM
-###############################################################################
 variable "bedrock_model_id" {
   description = "Amazon Bedrock model inference profile ID"
   type        = string
@@ -34,9 +30,7 @@ variable "bedrock_embedding_model_id" {
   default     = "amazon.titan-embed-text-v2:0"
 }
 
-###############################################################################
 # Langfuse
-###############################################################################
 variable "langfuse_public_key" {
   description = "Langfuse public key"
   type        = string
@@ -55,9 +49,7 @@ variable "langfuse_base_url" {
   default     = "https://us.cloud.langfuse.com"
 }
 
-###############################################################################
 # Container / AgentCore
-###############################################################################
 variable "container_image_tag" {
   description = "Tag for the agent Docker image in ECR"
   type        = string

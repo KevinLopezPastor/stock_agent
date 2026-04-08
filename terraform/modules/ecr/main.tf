@@ -1,6 +1,4 @@
-###############################################################################
 # ECR Repository
-###############################################################################
 resource "aws_ecr_repository" "agent" {
   name                 = "${var.project_name}-${var.environment}-agent"
   image_tag_mutability = "MUTABLE"
@@ -16,9 +14,7 @@ resource "aws_ecr_repository" "agent" {
   }
 }
 
-###############################################################################
 # Lifecycle policy — keep last 10 images
-###############################################################################
 resource "aws_ecr_lifecycle_policy" "agent" {
   repository = aws_ecr_repository.agent.name
 
@@ -42,9 +38,7 @@ resource "aws_ecr_lifecycle_policy" "agent" {
 
 data "aws_caller_identity" "current" {}
 
-###############################################################################
 # ECR Repository policy — allow Bedrock AgentCore role to pull the image
-###############################################################################
 resource "aws_ecr_repository_policy" "agent" {
   repository = aws_ecr_repository.agent.name
 

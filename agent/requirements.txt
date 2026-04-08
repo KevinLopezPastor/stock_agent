@@ -25,5 +25,7 @@ pypdf>=5.1.0
 sse-starlette>=2.0.0,<3.0.0
 
 # Observability
+aws-opentelemetry-distro
+opentelemetry-instrumentation-langchain
 langfuse>=2.53.0
 boto3>=1.35.0

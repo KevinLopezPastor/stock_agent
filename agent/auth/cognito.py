@@ -18,9 +18,7 @@ from jose import JWTError, jwk, jwt
 
 logger = logging.getLogger(__name__)
 
-# ---------------------------------------------------------------------------
 # Configuration from environment variables (set by AgentCore / Terraform)
-# ---------------------------------------------------------------------------
 COGNITO_REGION = os.environ.get("AWS_REGION", "us-east-1")
 COGNITO_USER_POOL_ID = os.environ.get("COGNITO_USER_POOL_ID", "")
 COGNITO_CLIENT_ID = os.environ.get("COGNITO_CLIENT_ID", "")

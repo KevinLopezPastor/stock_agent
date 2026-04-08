@@ -22,7 +22,7 @@ resource "aws_bedrockagentcore_agent_runtime" "main" {
     BEDROCK_EMBEDDING_MODEL_ID = var.bedrock_embedding_model_id
     LOG_LEVEL                  = "INFO"
     PYTHONUNBUFFERED           = "1"
-    UPDATE_TRIGGER             = "73"
+    UPDATE_TRIGGER             = "80"
   }
 
   # Network mode — the runtime needs outbound internet for yfinance & Langfuse
@@ -45,9 +45,7 @@ resource "aws_bedrockagentcore_agent_runtime" "main" {
   }
 }
 
-###############################################################################
 # AgentCore Runtime Endpoint
-###############################################################################
 resource "aws_bedrockagentcore_agent_runtime_endpoint" "main" {
   agent_runtime_id      = aws_bedrockagentcore_agent_runtime.main.agent_runtime_id
   agent_runtime_version = aws_bedrockagentcore_agent_runtime.main.agent_runtime_version

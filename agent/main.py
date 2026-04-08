@@ -6,12 +6,12 @@ import uuid
 import traceback
 from typing import AsyncGenerator
 
-from fastapi import FastAPI, HTTPException, Request, Depends
+import httpx  # For connectivity checks
+from fastapi import FastAPI, HTTPException, Request
 from sse_starlette.sse import EventSourceResponse
-from pydantic import BaseModel, Field
 
 # --- OBS IMPORTS ---
-from agent.observability import get_langfuse_handler
+from agent.observability import get_langfuse_handler, _load_langfuse_credentials
 
 # --- LOGGING CONFIG ---
 LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")
@@ -22,6 +22,33 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# --- DIAGNOSTIC: Force critical logs to stdout ---
+def log_signal(msg: str):
+    print(f">>> [SIGNAL] {msg}", file=sys.stdout)
+    sys.stdout.flush()
+    logger.info(f"[SIGNAL] {msg}")
+
+# --- NETWORK TEST ---
+async def test_langfuse_connectivity():
+    creds = _load_langfuse_credentials()
+    base_url = creds.get("LANGFUSE_BASE_URL", "https://us.cloud.langfuse.com")
+    pk = creds.get("LANGFUSE_PUBLIC_KEY", "")
+    
+    masked_pk = f"{pk[:8]}...{pk[-4:]}" if len(pk) > 12 else "INVALID"
+    log_signal(f"Testing connectivity to Langfuse Host: {base_url} (PK Status: {masked_pk})")
+    
+    try:
+        import socket
+        host_to_resolve = base_url.replace("https://", "").replace("http://", "").split("/")[0]
+        ip_addr = socket.gethostbyname(host_to_resolve)
+        log_signal(f"DNS Resolve: {host_to_resolve} -> {ip_addr}")
+
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.get(f"{base_url}/api/public/health")
+            log_signal(f"Langfuse Net Test: Status={response.status_code} Response={response.text}")
+    except Exception as e:
+        log_signal(f"Langfuse Net Test FAILURE: {str(e)}")
+
 # --- GRAPH INIT ---
 agent_graph = None
 init_error = None
@@ -29,41 +56,34 @@ init_error = None
 try:
     from agent.graph import create_agent_graph
     agent_graph = create_agent_graph()
-    logger.info(">>> [BOOT] Stock Agent Core components initialized. Version 73 (Signal Enabled).")
-    import sys
-    sys.stdout.flush()
+    log_signal(">>> [BOOT] Stock Agent Core initialized. Version 80 (Manual Tracing + Endpoint Fix).")
 except Exception as e:
     init_error = f"Import Error: {str(e)}\n{traceback.format_exc()}"
-    logger.error(f">>> [BOOT FAIL] Component Initialization Failed: {init_error}")
-    import sys
-    sys.stdout.flush()
+    log_signal(f">>> [BOOT FAIL] Component Initialization Failed: {init_error}")
 
-# ---------------------------------------------------------------------------
 # App Definition
-# ---------------------------------------------------------------------------
 app = FastAPI(
-    title="Stock Agent Signal API",
-    description="Official Signal Release (Version 73)",
-    version="1.0.73",
+    title="Stock Agent Sensor API",
+    description="Diagnostic Sensor Release (Version 80)",
+    version="1.0.80",
 )
 
-# ---------------------------------------------------------------------------
 # Health Check
-# ---------------------------------------------------------------------------
 @app.get("/ping")
 async def ping():
     return {
         "status": "healthy" if init_error is None else "degraded",
-        "version": "1.0.73"
+        "version": "1.0.80"
     }
 
-# ---------------------------------------------------------------------------
 # Agent Invocation (SSE streaming)
-# ---------------------------------------------------------------------------
 @app.post("/invocations")
 async def invocations(
     request: Request
 ):
+    # RUN SYNC NETWORK TEST ON FIRST CALL OR Startup
+    await test_langfuse_connectivity()
+
     # STABLE PRODUCTION AUTH
     headers_dict = dict(request.headers)
     user_email = headers_dict.get("x-amz-bedrock-agentcore-auth-user", "authenticated@agentcore.internal")
@@ -83,13 +103,13 @@ async def invocations(
         langfuse_handler = get_langfuse_handler(
             user_id=user_sub,
             session_id=thread_id,
-            trace_name="stock-agent-call-diag-71",
+            trace_name="stock-agent-v80",
         )
         
         if langfuse_handler:
-            logger.info(f">>> [OBS] Langfuse handler created successfully (Host: {getattr(langfuse_handler, 'host', 'Default')})")
+            log_signal(f">>> [OBS] Langfuse handler created successfully (Host: {getattr(langfuse_handler, 'host', 'Default')})")
         else:
-            logger.warning(">>> [OBS] Langfuse DISABLED: Missing credentials or initialization error.")
+            log_signal(">>> [OBS] Langfuse DISABLED: Missing credentials or initialization error.")
 
         async def event_stream() -> AsyncGenerator[dict, None]:
             config = {
@@ -133,6 +153,15 @@ async def invocations(
             except Exception as e:
                 logger.error(f"Stream Error: {traceback.format_exc()}")
                 yield {"event": "message", "data": json.dumps({"type": "error", "content": "\n[SYSTEM ERROR] Stream interrupted."})}
+            finally:
+                if langfuse_handler:
+                    try:
+                        # Flush the background thread explicitly!
+                        log_signal("Flushing Langfuse traces to network...")
+                        langfuse_handler.flush()
+                        log_signal("Langfuse flush complete.")
+                    except Exception as fe:
+                        log_signal(f"Error flushing traces: {fe}")
 
         return EventSourceResponse(event_stream())
 
