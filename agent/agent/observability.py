@@ -46,8 +46,12 @@ def get_langfuse_handler(
 ) -> Optional[object]:
     """Create a Langfuse callback handler for tracing an agent invocation."""
     try:
-        # SHIELDED IMPORT
-        from langfuse.callback import CallbackHandler
+        # SHIELDED IMPORT - Handle Langfuse V3+ breaking change
+        try:
+            from langfuse.langchain import CallbackHandler
+        except ImportError:
+            # Fallback for Langfuse < v3.0
+            from langfuse.callback import CallbackHandler
         
         creds = _load_langfuse_credentials()
         public_key = creds.get("LANGFUSE_PUBLIC_KEY", "")

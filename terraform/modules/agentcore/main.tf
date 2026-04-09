@@ -22,7 +22,7 @@ resource "aws_bedrockagentcore_agent_runtime" "main" {
     BEDROCK_EMBEDDING_MODEL_ID = var.bedrock_embedding_model_id
     LOG_LEVEL                  = "INFO"
     PYTHONUNBUFFERED           = "1"
-    UPDATE_TRIGGER             = "81"
+    UPDATE_TRIGGER             = "82"
   }
 
   # Network mode — the runtime needs outbound internet for yfinance & Langfuse
