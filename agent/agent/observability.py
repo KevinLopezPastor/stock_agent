@@ -62,15 +62,27 @@ def get_langfuse_handler(
             logger.warning("Langfuse credentials not configured — tracing disabled")
             return None
 
-        handler = CallbackHandler(
-            public_key=public_key,
-            secret_key=secret_key,
-            host=base_url,
-            user_id=user_id,
-            session_id=session_id,
-            trace_name=trace_name,
-            tags=["stock-agent", "agentcore"],
-        )
+        # Set environment variables so the new V4 LangchainCallbackHandler picks them up
+        os.environ["LANGFUSE_PUBLIC_KEY"] = public_key
+        os.environ["LANGFUSE_SECRET_KEY"] = secret_key
+        os.environ["LANGFUSE_HOST"] = base_url
+
+        try:
+            from langfuse.langchain import CallbackHandler
+            # V4 initialization takes no kwargs (relies on env vars for auth, metadata config for user/session)
+            handler = CallbackHandler()
+        except ImportError:
+            # Fallback for Langfuse < v3.0
+            from langfuse.callback import CallbackHandler
+            handler = CallbackHandler(
+                public_key=public_key,
+                secret_key=secret_key,
+                host=base_url,
+                user_id=user_id,
+                session_id=session_id,
+                trace_name=trace_name,
+                tags=["stock-agent", "agentcore"],
+            )
 
         logger.debug(f"Langfuse handler created (trace={trace_name}, user={user_id})")
         return handler

@@ -115,7 +115,12 @@ async def invocations(
         async def event_stream() -> AsyncGenerator[dict, None]:
             config = {
                 "configurable": {"thread_id": thread_id},
-                "callbacks": [langfuse_handler] if langfuse_handler else []
+                "callbacks": [langfuse_handler] if langfuse_handler else [],
+                "run_name": "stock-agent-v84",
+                "metadata": {
+                    "user_id": user_sub,
+                    "session_id": thread_id
+                }
             }
             input_messages = {"messages": [("user", query)]}
             
