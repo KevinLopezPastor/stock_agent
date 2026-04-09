@@ -26,10 +26,11 @@ EXPOSE 8080
 HEALTHCHECK --interval=20s --timeout=10s --start-period=60s --retries=5 \
   CMD curl -f http://127.0.0.1:8080/ping || exit 1
 
-# Re-enable OTEL auto-instrumentation now that IAM X-Ray fix is applied
-ENV OTEL_LOGS_EXPORTER=console
-ENV OTEL_TRACES_EXPORTER=otlp
-ENV OTEL_METRICS_EXPORTER=otlp
-ENV OTEL_PYTHON_LOGGING_AUTO_INSTRUMENTATION_ENABLED=false
+# Re-enable OTEL wrapper to capture stdout logs for AgentCore
+# Disable Traces/Metrics to avoid ADOT 403 Forbidden errors when X-Ray is not fully accessible
+ENV OTEL_TRACES_EXPORTER=none
+ENV OTEL_METRICS_EXPORTER=none
+# Let the Bedrock platform intercept standard logging via the default OTLP handler
+ENV OTEL_PYTHON_LOGGING_AUTO_INSTRUMENTATION_ENABLED=true
 
-CMD ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080", "--workers", "1"]
+CMD ["opentelemetry-instrument", "python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080", "--workers", "1"]

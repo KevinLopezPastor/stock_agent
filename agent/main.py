@@ -4,6 +4,7 @@ import os
 import sys
 import uuid
 import traceback
+import asyncio
 from typing import AsyncGenerator
 
 import httpx  # For connectivity checks
@@ -56,7 +57,7 @@ init_error = None
 try:
     from agent.graph import create_agent_graph
     agent_graph = create_agent_graph()
-    log_signal(">>> [BOOT] Stock Agent Core initialized. Version 80 (Manual Tracing + Endpoint Fix).")
+    log_signal(">>> [BOOT] Stock Agent Core initialized. Version 81 (OTEL Logging + Safe Flush).")
 except Exception as e:
     init_error = f"Import Error: {str(e)}\n{traceback.format_exc()}"
     log_signal(f">>> [BOOT FAIL] Component Initialization Failed: {init_error}")
@@ -64,8 +65,8 @@ except Exception as e:
 # App Definition
 app = FastAPI(
     title="Stock Agent Sensor API",
-    description="Diagnostic Sensor Release (Version 80)",
-    version="1.0.80",
+    description="Diagnostic Sensor Release (Version 81)",
+    version="1.0.81",
 )
 
 # Health Check
@@ -158,7 +159,8 @@ async def invocations(
                     try:
                         # Flush the background thread explicitly!
                         log_signal("Flushing Langfuse traces to network...")
-                        langfuse_handler.flush()
+                        # We use asyncio.to_thread to prevent blocking the async generator shutdown
+                        await asyncio.to_thread(langfuse_handler.flush)
                         log_signal("Langfuse flush complete.")
                     except Exception as fe:
                         log_signal(f"Error flushing traces: {fe}")
